@@ -1,7 +1,7 @@
 name: generalized-sexual-selection
 
 dependencies:
-  -pytho=3.6
+  -python=3.6
   -ipywidgets=7.0.*
   -matplotlib=2.1.*
   -numpy=1.13.*
