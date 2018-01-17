@@ -37,8 +37,8 @@ def plot_generalized_sexual_selection(x0, x1, x2, selection_function, d0, d2,
         UGA = lambda x_A: selection_functions.kirkpatrick_selection(x_A, d0)
         UgA = lambda x_A: selection_functions.kirkpatrick_selection(x_A, d2)
     elif selection_function == "seger":
-        UGA = lambda x_A: selection_function.seger_selection(x_A, d0)
-        UgA = lambda x_A: selection_function.seger_selection(x_A, d2)
+        UGA = lambda x_A: selection_functions.seger_selection(x_A, d0)
+        UgA = lambda x_A: selection_functions.seger_selection(x_A, d2)
     else:
       raise ValueError("selection_function must be one of \"kirkpatrick\" or \"seger\".")
 
