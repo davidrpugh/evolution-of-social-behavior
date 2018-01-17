@@ -1,3 +1,9 @@
+"""
+Code defining the models.
+
+@author davidrpugh
+
+"""
 import numpy as np
 
 
@@ -30,7 +36,7 @@ def generalized_sexual_selection(x, UGA, UgA, payoff_kernel, mutation_rate=0.0,
 
     # mating probabilities are frequency dependent
     x_A, x_a = np.sum(x[::2]), np.sum(x[1::2])
-    #assert np.allclose(x_a, 1 - x_A, atol=1e-6), "1-x_A should equal x_a; actual difference is {}".format(1 - x_A - x_a)
+    assert np.allclose(x_a, 1 - x_A, atol=1e-5), "1-x_A should equal x_a; actual difference is {}".format(1 - x_A - x_a)
 
     # determine the payoffs
     Pi = np.tile(payoff_kernel, (2, 2))
@@ -59,6 +65,6 @@ def generalized_sexual_selection(x, UGA, UgA, payoff_kernel, mutation_rate=0.0,
     offspring_by_genotype = W.sum(axis=0).dot(x)
     total_offspring = offspring_by_genotype.sum(axis=0)
     x_dot = (offspring_by_genotype / total_offspring) - x
-    #assert np.allclose(x_dot.sum(), 0.0, atol=1e-6), "Derivatives should sum to one; actual sum is {}".format(x_dot.sum())
+    assert np.allclose(x_dot.sum(), 0.0, atol=1e-5), "Derivatives should sum to one; actual sum is {}".format(x_dot.sum())
 
     return x_dot
