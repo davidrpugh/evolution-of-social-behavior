@@ -12,7 +12,7 @@ import models
 import selection_functions
 
 
-def plot_generalized_sexual_selection(x0, x1, x2, selection_function, d0, d2,
+def plot_generalized_sexual_selection(x1, x2, x3, selection_function, d1, d3,
                                       T, R, P, S, mutation_rate, max_time):
 
     fig, ax = plt.subplots(1,1, figsize=(10,8))
@@ -23,8 +23,8 @@ def plot_generalized_sexual_selection(x0, x1, x2, selection_function, d0, d2,
     ax.set_ylabel(r"Female genotype shares, $x_i$", fontsize=15)
 
     # create the initial condition
-    x3 = 1 - (x0 + x1 + x2)
-    y0=np.array([x0,x1,x2,x3])
+    x4 = 1 - (x1 + x2 + x3)
+    y0=np.array([x1,x2,x3,x4])
     assert np.allclose(y0.sum(), 1)
 
     # create the payoff kernel
@@ -34,11 +34,11 @@ def plot_generalized_sexual_selection(x0, x1, x2, selection_function, d0, d2,
 
     # create the selection functions
     if selection_function == "kirkpatrick":
-        UGA = lambda x_A: selection_functions.kirkpatrick_selection(x_A, d0)
-        UgA = lambda x_A: selection_functions.kirkpatrick_selection(x_A, d2)
+        UGA = lambda x_A: selection_functions.kirkpatrick_selection(x_A, d1)
+        UgA = lambda x_A: selection_functions.kirkpatrick_selection(x_A, d3)
     elif selection_function == "seger":
-        UGA = lambda x_A: selection_functions.seger_selection(x_A, d0)
-        UgA = lambda x_A: selection_functions.seger_selection(x_A, d2)
+        UGA = lambda x_A: selection_functions.seger_selection(x_A, d1)
+        UgA = lambda x_A: selection_functions.seger_selection(x_A, d3)
     else:
       raise ValueError("selection_function must be one of \"kirkpatrick\" or \"seger\".")
 
