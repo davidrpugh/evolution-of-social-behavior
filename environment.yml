@@ -4,7 +4,10 @@ dependencies:
   - python=3.6
   - ipywidgets
   - matplotlib
+  - mpld3
   - numpy
   - pandas
   - scipy
   - sympy
+  - pip:
+    - mpld3
