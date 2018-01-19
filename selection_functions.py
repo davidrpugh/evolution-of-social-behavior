@@ -9,7 +9,7 @@ def kirkpatrick_selection(x_A, d=1):
 
 
 def kirkpatrick_selection_derivative(x_A, d=1):
-    return (1 + (d - 1) * x_A)**-2
+    return d / (1 + (d - 1) * x_A)**2
 
 
 def seger_selection(x_A, d=0):
