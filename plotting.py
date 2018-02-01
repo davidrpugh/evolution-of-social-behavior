@@ -21,8 +21,7 @@ def plot_generalized_sexual_selection(x1, x2, x3, selection_function, d1, d3,
     # prepare the axes
     ax.set_ylim((0, 1))
     ax.set_xlabel(r"Time, $t$", fontsize=15)
-    ax.set_ylabel(r"Female genotype shares, $x_i$", fontsize=15)
-    ax.set_title(r"Payoffs: T={}, R={}, P={}, S={}".format(T, R, P, S), fontsize=25)
+    ax.set_ylabel(r"Offspring genotype shares, $x_i$", fontsize=15)
 
     # create the initial condition
     x4 = 1 - (x1 + x2 + x3)
@@ -67,8 +66,7 @@ def plot_monomorphic_gamma_sexual_selection(x1, selection_function, d1, d3,
     # prepare the axes
     ax.set_ylim((0, 1))
     ax.set_xlabel(r"Time, $t$", fontsize=15)
-    ax.set_ylabel(r"Female genotype shares, $x_i$", fontsize=15)
-    ax.set_title(r"Payoffs: T={}, R={}, P={}, S={}".format(T, R, P, S), fontsize=25)
+    ax.set_ylabel(r"Offspring genotype shares, $x_i$", fontsize=15)
 
     # create the initial condition
     x2 = 1 - x1
