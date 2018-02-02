@@ -20,5 +20,9 @@ def seger_selection_derivative(x_A, d=0):
     return 1 + d * (1 - 2 * x_A)
 
 
-def wright_bergstrom_matching(x_A, d=0):
-    return d + (1 - d) * xA
+def wright_bergstrom_selection(x_A, d=0):
+    return d + (1 - d) * x_A
+
+
+def wright_bergstrom_selection_derivative(x_A, d=0):
+    return (1 - d)
