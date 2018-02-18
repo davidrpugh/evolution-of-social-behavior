@@ -192,17 +192,19 @@ def equation_motion_ga_share(x1, x2, x3, UGA, UgA, T, R, P, S):
     return x4_dot
 
 # define symbolic variables
-x1, x2, x3 = sym.symbols('x1, x2, x3')
+x1, x2, x3, xA = sym.symbols('x1, x2, x3, xA')
 T, R, P, S = sym.symbols('T, R, P, S')
 
 # equations for generalized sexual selection model
 F = sym.Matrix([equation_motion_GA_share(x1, x2, x3, UGA, UgA, T, R, P, S),
                 equation_motion_Ga_share(x1, x2, x3, UGA, UgA, T, R, P, S),
                 equation_motion_gA_share(x1, x2, x3, UGA, UgA, T, R, P, S)])
-F_jac = F.jacobian((x1, x2, x3))
+F_jac = (F.jacobian((x1, x2, x3))
+          .subs({x1+x3: xA})
+          .doit())
 
 _F = sym.lambdify((x1, x2, x3, UGA, UgA, T, R, P, S), F, modules="numpy")
-_F_jac = sym.lambdify((x1, x2, x3, UGA, UgA, T, R, P, S), F_jac, modules="numpy")
+_F_jac = sym.lambdify((x1, x2, x3, xA, UGA, sym.Derivative(UGA(xA), xA), UgA, sym.Derivative(UgA(xA), xA), T, R, P, S), F_jac, modules="numpy")
 
 # equations for the monomorphic_gamma model
 f = sym.Matrix([equation_motion_GA_share(x1, 1-x1, 0, UGA, UgA, T, R, P, S)])
