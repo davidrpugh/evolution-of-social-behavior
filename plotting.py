@@ -65,21 +65,26 @@ def plot_generalized_sexual_selection(x1, x2, x3, selection_function, d1, d3,
     axes[0].plot(solution.t, solution.y[3], label="ga")
     axes[0].legend()
 
+    def total_offspring(yt):
+        W = models.generalized_sexual_selection(yt, UGA, UgA, payoff_kernel, M, m, epsilon)
+        N = models.total_offspring(W, yt)
+        return N
+
     def fitness(y):
         _, T = y.shape
         Ns = []
         for t in range(T):
             yt = y[:,[t]]
-            W = models.generalized_sexual_selection(yt, UGA, UgA, payoff_kernel, M, m, epsilon)
-            N = models.total_offspring(W, yt)
+            N = total_offspring(yt)
             Ns.append(N)
         return np.array(Ns)
 
     axes[1].plot(solution.t, fitness(solution.y))
 
-    f = lambda x: -symbolics._equilibrium_total_offspring(x[0], x[1], x[2], T, R, P, S)
-    x0 = 0.5 * np.ones(3)
-    optimize_result = optimize.minimize(f, x0, bounds=[(0,1), (0,1), (0,1)])
+    optimize_result = optimize.minimize(lambda y: -total_offspring(y.reshape(-1, 1)),
+                                        x0=0.25 * np.ones(4),
+                                        bounds=[(0,1), (0,1), (0,1), (0,1)],
+                                        constraints={"type": "eq", "fun": lambda y: y.sum() - 1})
     axes[1].axhline(-optimize_result.fun, color='k', linestyle="--", label=r"$\bar{N}^*$")
     axes[1].legend()
 
