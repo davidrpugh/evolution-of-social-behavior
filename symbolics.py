@@ -204,7 +204,7 @@ F_jac = (F.jacobian((x1, x2, x3))
           .doit())
 
 _F = sym.lambdify((x1, x2, x3, UGA, UgA, T, R, P, S), F, modules="numpy")
-_F_jac = sym.lambdify((x1, x2, x3, xA, UGA, sym.Derivative(UGA(xA), xA), UgA, sym.Derivative(UgA(xA), xA), T, R, P, S), F_jac, modules="numpy")
+#_F_jac = sym.lambdify((x1, x2, x3, xA, UGA, sym.Derivative(UGA(xA), xA), UgA, sym.Derivative(UgA(xA), xA), T, R, P, S), F_jac, modules="numpy")
 
 # equations for the monomorphic_gamma model
 f = sym.Matrix([equation_motion_GA_share(x1, 1-x1, 0, UGA, UgA, T, R, P, S)])
