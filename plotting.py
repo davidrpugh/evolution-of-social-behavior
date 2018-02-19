@@ -14,7 +14,7 @@ import symbolics
 
 
 def plot_generalized_sexual_selection(x1, x2, x3, selection_function, d1, d3,
-                                      T, R, P, S, max_time):
+                                      T, R, P, S, M, m, epsilon, max_time):
 
     fig, axes = plt.subplots(1,2, figsize=(15,8), sharex=True)
 
@@ -27,7 +27,8 @@ def plot_generalized_sexual_selection(x1, x2, x3, selection_function, d1, d3,
     axes[1].set_ylabel(r"Total Offspring (Fitness), $N(t)$", fontsize=15)
 
     # create the initial condition
-    y0=np.array([x1,x2,x3])
+    x4 = 1 - x1 - x2 - x3
+    y0=np.array([x1,x2,x3, x4])
     assert y0.sum() <= 1
 
     # create the payoff kernel
@@ -45,30 +46,43 @@ def plot_generalized_sexual_selection(x1, x2, x3, selection_function, d1, d3,
         UGA = lambda x_A: selection_functions.wright_bergstrom_selection(x_A, d1)
         UgA = lambda x_A: selection_functions.wright_bergstrom_selection(x_A, d3)
     else:
-        valid_funcs = ("kirkpatrick", "seger", "wright-bergstrom")
+        valid_funcs = ("kirkpatrick", "seger", "wright")
         msg = "Selection_function must be one of {}, {}, or {}.".format(*valid_funcs)
         raise ValueError(msg)
 
     # simulate the model starting from a random initial condition
-    f = lambda t, y: symbolics.generalized_sexual_selection(y, UGA, UgA, payoff_kernel)
+    def f(t, y):
+        W = models.generalized_sexual_selection(y, UGA, UgA, payoff_kernel, M, m, epsilon)
+        y_dot = models.offspring_genotypes_evolution(W, y)
+        return y_dot
+
     solution = integrate.solve_ivp(f, t_span=(0, max_time), y0=y0, rtol=1e-9,
                                    atol=1e-12, dense_output=True, vectorized=True)
 
     axes[0].plot(solution.t, solution.y[0], label="GA")
     axes[0].plot(solution.t, solution.y[1], label="Ga")
     axes[0].plot(solution.t, solution.y[2], label="gA")
-    axes[0].plot(solution.t, 1 - solution.y.sum(axis=0), label="ga")
+    axes[0].plot(solution.t, solution.y[3], label="ga")
     axes[0].legend()
 
-    total_offspring = lambda y: symbolics.total_offspring(y[0], y[1], y[2], UGA, UgA, T, R, P, S)
-    axes[1].plot(solution.t, total_offspring(solution.y))
+    def fitness(y):
+        _, T = y.shape
+        Ns = []
+        for t in range(T):
+            yt = y[:,[t]]
+            W = models.generalized_sexual_selection(yt, UGA, UgA, payoff_kernel, M, m, epsilon)
+            N = models.total_offspring(W, yt)
+            Ns.append(N)
+        return np.array(Ns)
+
+    axes[1].plot(solution.t, fitness(solution.y))
 
     f = lambda x: -symbolics._equilibrium_total_offspring(x[0], x[1], x[2], T, R, P, S)
     x0 = 0.5 * np.ones(3)
     optimize_result = optimize.minimize(f, x0, bounds=[(0,1), (0,1), (0,1)])
     axes[1].axhline(-optimize_result.fun, color='k', linestyle="--", label=r"$\bar{N}^*$")
     axes[1].legend()
-    
+
     plt.show()
 
     return (solution, optimize_result)
@@ -105,7 +119,7 @@ def plot_monomorphic_gamma_sexual_selection(x1, selection_function, d1, d3,
         UGA = lambda x_A: selection_functions.wright_bergstrom_selection(x_A, d1)
         UgA = lambda x_A: selection_functions.wright_bergstrom_selection(x_A, d3)
     else:
-        valid_funcs = ("kirkpatrick", "seger", "wright-bergstrom")
+        valid_funcs = ("kirkpatrick", "seger", "wright")
         msg = "Selection_function must be one of {}, {}, or {}.".format(*valid_funcs)
         raise ValueError(msg)
 

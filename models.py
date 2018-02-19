@@ -102,20 +102,7 @@ def offspring_genotypes_evolution(W, x):
     return x_dot
 
 
-def generalized_sexual_selection(x, UGA, UgA, payoff_kernel, mutation_rate=0.0):
-    number_of_genotypes, _ = x.shape
-    x_A, x_a = np.sum(x[::2]), np.sum(x[1::2])
-    phenotype_selection_kernel = np.vstack((np.tile(np.array([UGA(x_A), 1 - UGA(x_A)]), (2,2)),
-                                            np.tile(np.array([UgA(x_A), 1 - UgA(x_A)]), (2,2))))
-    S = np.tile(x, number_of_genotypes).T / np.array([x_A, x_a, x_A, x_a])
-    R = _haploid_inheritance_probabilities(mutation_rate)
-    Pi = np.tile(payoff_kernel, (2, 2))
-    W = R * ((phenotype_selection_kernel * S)[:, :, np.newaxis] *
-              np.tile(phenotype_selection_kernel * Pi, (number_of_genotypes, 1, 1))).sum(axis=2)
-    return W
-
-
-def generalized_sexual_selection2(x, UGA, UgA, payoff_kernel, M=0, m=0, epsilon=0.0):
+def generalized_sexual_selection(x, UGA, UgA, payoff_kernel, M=0, m=0, epsilon=0.0):
     number_of_genotypes, _ = x.shape
     x_A, x_a = np.sum(x[::2]), np.sum(x[1::2])
     phenotype_selection_kernel = np.vstack((np.tile(np.array([UGA(x_A), 1 - UGA(x_A)]), (2,2)),
