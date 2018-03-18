@@ -4,6 +4,45 @@ Module containing various selection functions previously used in the literature.
 @author davidrpugh
 
 """
+
+import sympy as sym
+
+
+class U(sym.Function):
+    """Generic selection function"""
+
+    is_real = True
+
+    is_nonnegative = True
+
+    @classmethod
+    def eval(cls, x):
+        """We require the U(0)=0 and U(1)=1"""
+        if x.is_Number and x is sym.S.Zero:
+            return sym.S.Zero
+        elif x.is_Number and x is sym.S.One:
+            return sym.S.One
+
+    def fdiff(self, argindex):
+        return U_prime(self.args[0])
+
+
+class U_prime(sym.Function):
+    """Derivative of generic selection function."""
+
+    is_real = True
+
+    is_nonnegative = True
+
+    @classmethod
+    def eval(cls, x):
+        """We require the U(0)=0 and U(1)=1"""
+        if x.is_Number and x is sym.S.Zero:
+            return sym.S.Zero
+        elif x.is_Number and x is sym.S.One:
+            return sym.S.One
+
+
 def kirkpatrick_selection(x_A, d=1):
     return d * x_A / (1 + (d - 1) * x_A)
 
