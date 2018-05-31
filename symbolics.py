@@ -2,11 +2,30 @@ import sympy as sym
 
 
 class U(sym.Function):
-    """Generic matching function"""
+    """Generic selection function"""
 
     is_real = True
 
-    is_positive = True
+    is_nonnegative = True
+
+    @classmethod
+    def eval(cls, x):
+        """We require the U(0)=0 and U(1)=1"""
+        if x.is_Number and x is sym.S.Zero:
+            return sym.S.Zero
+        elif x.is_Number and x is sym.S.One:
+            return sym.S.One
+
+    def fdiff(self, argindex):
+        return U_prime(self.args[0])
+
+
+class U_prime(sym.Function):
+    """Derivative of generic selection function."""
+
+    is_real = True
+
+    is_nonnegative = True
 
     @classmethod
     def eval(cls, x):
@@ -18,11 +37,11 @@ class U(sym.Function):
 
 
 class UGA(U):
-    """Matching function for G females."""
+    """Selection function for G females."""
 
 
 class UgA(U):
-    """Matching function for g females."""
+    """Selection function for g females."""
 
 
 def total_offspring(x1, x2, x3, UGA, UgA, T, R, P, S):
