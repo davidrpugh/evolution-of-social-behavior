@@ -16,9 +16,6 @@ class U(sym.Function):
         elif x.is_Number and x is sym.S.One:
             return sym.S.One
 
-    def fdiff(self, argindex):
-        return U_prime(self.args[0])
-
 
 class U_prime(sym.Function):
     """Derivative of generic selection function."""
