@@ -8,27 +8,46 @@ import numpy as np
 import sympy as sym
 
 
-def _haploid_inheritance_probabilities(mutation_rate):
+def _haploid_inheritance_probabilities(mutation_rate, incumbent_only):
     """
     R[i,j,k] is offspring genotype i from mother with genotype j and father with genotype k.
 
     """
-    R = np.array([[[1 - mutation_rate, 1/2, (1/2) * (1 - mutation_rate), 1/4],
-                   [1/2, mutation_rate, 1/4, (1/2) * mutation_rate],
-                   [(1/2) * (1 - mutation_rate), 1/4, 0, 0],
-                   [1/4, (1/2) * mutation_rate, 0, 0]],
-                  [[mutation_rate, 1/2, (1/2) * mutation_rate, 1/4],
-                   [1/2, 1 - mutation_rate, 1/4, (1/2) * (1 - mutation_rate)],
-                   [(1/2) * mutation_rate, 1/4, 0, 0],  # discrepancy here!
-                   [1/4, (1/2) * (1 - mutation_rate), 0, 0]],
-                  [[0, 0, (1/2) * (1 - mutation_rate), 1/4],
-                   [0, 0, 1/4, (1/2) * mutation_rate],
-                   [(1/2) * (1 - mutation_rate), 1/4, 1 - mutation_rate, 1/2],
-                   [1/4, (1/2) * mutation_rate, 1/2, mutation_rate]],
-                  [[0, 0, (1/2) * mutation_rate, 1/4],
-                   [0, 0, 1/4, (1/2) * (1 - mutation_rate)],
-                   [(1/2) * mutation_rate, 1/4, mutation_rate, 1/2],
-                   [1/4, (1/2) * (1 - mutation_rate), 1/2, 1 - mutation_rate]]])
+    if incumbent_only:
+        R = np.array([[[1 - mutation_rate, 1/2, (1/2) * (1 - mutation_rate), 1/4],
+                       [1/2, 0, 1/4, 1/4 * mutation_rate],
+                       [(1/2) * (1 - mutation_rate), 1/4, 0, 0],
+                       [1/4, (1/4) * mutation_rate, 0, 0]],
+                      [[mutation_rate, 1/2, 1/2 * mutation_rate, 1/4],
+                       [1/2, 1, 1/4, (1/2) * (1 - (1/2) * mutation_rate)],
+                       [1/2 * mutation_rate, 1/4, 0, 0],
+                       [1/4, (1/2) * (1 - (1/2) * mutation_rate), 0, 0]],
+                      [[0, 0, (1/2) * (1 - mutation_rate), 1/4],
+                       [0, 0, 1/4, (1/4) * mutation_rate],
+                       [(1/2) * (1 - mutation_rate), 1/4, 1-mutation_rate, 1/2],
+                       [1/4, (1/4) * mutation_rate, 1/2, 0]],
+                      [[0, 0, 1/2 * mutation_rate, 1/4],
+                       [0, 0, 1/4, (1/2) * (1 - (1/2) * mutation_rate)],
+                       [(1/2) * mutation_rate, 1/4, mutation_rate, 1/2],
+                       [1/4, (1/2) * (1 - (1/2) * mutation_rate), 1/2, 1]]])
+    else:
+        R = np.array([[[1 - mutation_rate, 1/2, (1/2) * (1 - mutation_rate), 1/4],
+                       [1/2, mutation_rate, 1/4, (1/2) * mutation_rate],
+                       [(1/2) * (1 - mutation_rate), 1/4, 0, 0],
+                       [1/4, (1/2) * mutation_rate, 0, 0]],
+                      [[mutation_rate, 1/2, (1/2) * mutation_rate, 1/4],
+                       [1/2, 1 - mutation_rate, 1/4, (1/2) * (1 - mutation_rate)],
+                       [(1/2) * mutation_rate, 1/4, 0, 0],  # discrepancy here!
+                       [1/4, (1/2) * (1 - mutation_rate), 0, 0]],
+                      [[0, 0, (1/2) * (1 - mutation_rate), 1/4],
+                       [0, 0, 1/4, (1/2) * mutation_rate],
+                       [(1/2) * (1 - mutation_rate), 1/4, 1 - mutation_rate, 1/2],
+                       [1/4, (1/2) * mutation_rate, 1/2, mutation_rate]],
+                      [[0, 0, (1/2) * mutation_rate, 1/4],
+                       [0, 0, 1/4, (1/2) * (1 - mutation_rate)],
+                       [(1/2) * mutation_rate, 1/4, mutation_rate, 1/2],
+                       [1/4, (1/2) * (1 - mutation_rate), 1/2, 1 - mutation_rate]]])
+        
     return R
 
 
@@ -64,13 +83,13 @@ def offspring_genotypes_evolution(W, x):
     return x_dot
 
 
-def generalized_sexual_selection(x, UGA, UgA, payoff_kernel, M=0, m=0, mutation_rate=0.0):
+def generalized_sexual_selection(x, UGA, UgA, payoff_kernel, M=0, m=0, mutation_rate=0.0, incumbent_only=False):
     number_of_genotypes, _ = x.shape
     x_A, x_a = np.sum(x[::2]), np.sum(x[1::2])
     phenotype_selection_kernel = np.vstack((np.tile(np.array([UGA(x_A), 1 - UGA(x_A)]), (2,2)),
                                             np.tile(np.array([UgA(x_A), 1 - UgA(x_A)]), (2,2))))
     S = np.tile(x, number_of_genotypes).T / np.array([x_A, x_a, x_A, x_a])
-    R = _haploid_inheritance_probabilities(mutation_rate)
+    R = _haploid_inheritance_probabilities(mutation_rate, incumbent_only)
     net_payoffs = _net_payoffs(payoff_kernel, M, m)
     W = R * ((phenotype_selection_kernel * S) * (phenotype_selection_kernel[:, np.newaxis, :] * net_payoffs).sum(axis=2))[np.newaxis, :, :]
     return W
